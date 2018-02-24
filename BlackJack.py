@@ -13,7 +13,9 @@ def clr():
     dealt_cards['player'] = []
 
 def play():
-    """Game starts from here and end here."""
+    """Game starts from here."""
+    print "Initially Money Given from house to player\n".title()
+
     dealer()
 
     while True:
@@ -22,6 +24,7 @@ def play():
             game_in = str(raw_input('Do You want play another round\t'))
             if game_in in ['yes', 'y', 'YES', 'Y']:
                 if money['player'] > 0:
+
                     dealer()
                 else:
                     print 'No money left in your account please come back later'.upper()
@@ -84,6 +87,8 @@ class Player(object):
 
     def __init__(self, bet_money=0):
         self.bet_money = bet_money
+    def return_bet_money(self):
+        return self.bet_money
 
     def player_choice(self):
         while True:
@@ -91,6 +96,8 @@ class Player(object):
                 try:
                     self.p_choice = str(raw_input("Do you want to hit or stand? h/s\t"))
                     os.system('clear')
+                    # to print Dealer first card
+                    print "one of the cards of dealer is {x}".format(x=dealt_cards['dealer'][0][0]).title()
                     if self.p_choice == 'h' or self.p_choice == 's':
                         break
                     else:
@@ -127,19 +134,18 @@ class Player(object):
 
 def dealer():
     clr()
-    sum_dealer = sum_player = 0
+    # sum_dealer = sum_player = 0
     global dealt_cards
 
     os.system('clear')
     print "Hey There ! I'm dealer I'll dealt cards for you\n"
-    # instance of object Deck and player for single player
-    print 'Initially Money Given from house to {x}\nYou have {y} amount now'.format(x='player',
-                                                                                    y=money['player']).title()
+    print "You {x} as Current amount".format(x=money['player'])
 
     while True:
         try:
             b_money = int(raw_input("Enter your bet money. Be Carefull!!!\t"))
             if 0 < b_money <= money['player']:
+                # instance of object player for single player
                 p1 = Player(b_money)
             else:
                 print "please enter money within [0-{x}]\n".format(x=money['player'])
@@ -154,24 +160,20 @@ def dealer():
         dealt_cards['player'].append(d1.get_card())
 
     # to print Dealer first card
-    times_i_want_to_print = 1
-    for e in dealt_cards['dealer']:
-        if times_i_want_to_print > 0:
-            print "one of the cards of dealer is {x}".format(x=e[0]).title()
-            times_i_want_to_print -= 1
+    print "one of the cards of dealer is {x}".format(x=dealt_cards['dealer'][0][0]).title()
 
-        # Initally show both cards of player
+    # Initially show both cards of player
     p1.p_show_cards()
-    # Intial check is player is busted or has won a blackjack
+    # Initial check is player is busted or has won a blackjack
     if check_bust('player'):
         # to deduct the bet_money from player's account
-        debit_money('player', 'dealer', bet_money)
+        debit_money('player', 'dealer', p1.return_bet_money())
 
         return
 
     if blackjack('player'):
         # to deduct the bet_money from dealer's account
-        debit_money('dealer', 'player', bet_money)
+        debit_money('dealer', 'player', p1.return_bet_money())
         print 'Current Money of {x} is : {y}'.format(x='player', y=money['player'])
 
         return
